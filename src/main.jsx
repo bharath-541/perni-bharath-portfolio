@@ -13,6 +13,8 @@ const profileLinks = {
   tibzeeLogo: 'https://raw.githubusercontent.com/bharath-541/Tibzee_landing_react/main/public/tibzee_logo.png',
 }
 
+const themeStorageKey = 'portfolio-theme-v2'
+
 const projects = [
   {
     id: 'tibzee',
@@ -234,12 +236,12 @@ function App() {
   const [sent, setSent] = useState(false)
   const [theme, setTheme] = useState(() => {
     if (typeof window === 'undefined') return 'dark'
-    return localStorage.getItem('portfolio-theme') || 'dark'
+    return localStorage.getItem(themeStorageKey) || 'dark'
   })
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
-    localStorage.setItem('portfolio-theme', theme)
+    localStorage.setItem(themeStorageKey, theme)
   }, [theme])
 
   useEffect(() => {
