@@ -234,7 +234,7 @@ function App() {
   const [sent, setSent] = useState(false)
   const [theme, setTheme] = useState(() => {
     if (typeof window === 'undefined') return 'dark'
-    return localStorage.getItem('portfolio-theme') || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+    return localStorage.getItem('portfolio-theme') || 'dark'
   })
 
   useEffect(() => {
