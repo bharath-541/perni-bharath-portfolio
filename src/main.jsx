@@ -2,434 +2,901 @@ import { useEffect, useMemo, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './styles.css'
 
-const profileLinks = {
-  primaryGithub: 'https://github.com/bharath-541',
-  ayuGithub: 'https://github.com/bharath-ayu',
-  linkedin: 'https://in.linkedin.com/in/perni-bharath-raghavendra-522529265',
-  email: 'mailto:pernibharath15@gmail.com',
+/* ── Links ─────────────────────────────────────────────── */
+const asset = path => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`
+
+const L = {
+  gh:         'https://github.com/bharath-541',
+  ayugh:      'https://github.com/bharath-ayu',
+  li:         'https://in.linkedin.com/in/perni-bharath-raghavendra-522529265',
+  mail:       'mailto:pernibharath15@gmail.com',
+  cv:         asset('Perni-Bharath.pdf'),
   tibzeePlay: 'https://play.google.com/store/apps/details?id=com.arunodeep.tibzee&pli=1',
   tibzeeLive: 'https://tibzee-landing-react.vercel.app/',
-  tibzeeSource: 'https://github.com/bharath-541/Tibzee_landing_react',
-  tibzeeLogo: 'https://raw.githubusercontent.com/bharath-541/Tibzee_landing_react/main/public/tibzee_logo.png',
 }
 
-const themeStorageKey = 'portfolio-theme-v2'
+const NAV  = ['About', 'Work', 'Hackathons', 'Experience', 'Stack', 'Events', 'Contact']
+const NIDS = ['about', 'work', 'hackathons', 'experience', 'stack', 'events', 'contact']
 
-const projects = [
+/* ── Data ──────────────────────────────────────────────── */
+const PROJECTS = [
   {
     id: 'tibzee',
+    idx: '01',
     name: 'Tibzee',
-    index: '01',
-    type: 'Preschool operations platform',
-    description:
-      'A calm, all-in-one workspace for preschool teachers and administrators: attendance, reports, parent messages, activities, stars, and fee records.',
-    stack: ['React', 'Tailwind CSS', 'Android'],
-    href: profileLinks.tibzeePlay,
-    sourceHref: profileLinks.tibzeeSource,
+    cat: 'Ventures & Startups',
+    type: 'Preschool Operations & Parent SaaS',
+    desc: 'Co-founded and engineered a teacher-parent communication and classroom operations platform. Led customer discovery across 6+ preschools and conducted a 1-month live school pilot.',
+    stack: ['React', 'Tailwind CSS', 'Node.js', 'Android', 'Product'],
+    href: L.tibzeePlay,
+    source: L.tibzeeLive,
+    preview: 'https://tibzee-landing-react.vercel.app/',
+    badge: 'Co-Founder'
   },
   {
-    id: 'finsight',
-    name: 'FinSight',
-    index: '02',
-    type: 'Full-stack finance app',
-    description:
-      'A personal finance workspace for tracking expenses, assets, debts, EMIs, and a practical 50 / 30 / 20 budget.',
-    stack: ['MERN', 'MongoDB', 'Express'],
-    href: 'https://github.com/bharath-541/FinSight',
+    id: 'nammaturf',
+    idx: '02',
+    name: 'Namma Turf',
+    cat: 'Ventures & Startups',
+    type: 'Corporate Sports League Platform',
+    desc: 'Contributed to app and web development for Namma Turf — an automated platform that manages employee sports leagues, match scheduling, and tournament operations.',
+    stack: ['React', 'Node.js', 'REST APIs', 'Mobile App'],
+    href: 'https://www.nammaturf.com/',
+    preview: 'https://www.nammaturf.com/',
+    badge: 'Contributor'
+  },
+  {
+    id: 'social',
+    idx: '03',
+    name: 'Social Media Insights AI',
+    cat: 'Backend & AI',
+    type: 'AI Performance Analytics Engine',
+    desc: 'Built an AI analytics engine using Langflow, LangChain, and DataStax Astra DB vector store to parse engagement signals and derive content strategy metrics. Level SuperMind Hackathon.',
+    stack: ['Python', 'Langflow', 'Astra DB', 'Vector Search', 'AWS'],
+    href: 'https://github.com/Soham-1304/Social_media_insights',
+    badge: 'SuperMind Cert'
   },
   {
     id: 'clyra',
+    idx: '04',
     name: 'Clyra',
-    index: '03',
-    type: 'AI insurance claims system',
-    description:
-      'A claims workflow combining document extraction, fraud detection, priority queues, and real-time role-based dashboards.',
-    stack: ['React', 'Node.js', 'MongoDB'],
+    cat: 'Backend & AI',
+    type: 'AI Insurance Claims Automation',
+    desc: 'Intelligent insurance claims workflow integrating automated document OCR extraction, fraud anomaly detection, dynamic triage queues, and real-time dashboard state.',
+    stack: ['React', 'Node.js', 'MongoDB', 'AI Extraction', 'Express'],
     href: 'https://github.com/bharath-541/Clyra-insurance-claims',
+    badge: 'AI Pipeline'
   },
   {
-    id: 'social-media-insights',
-    name: 'Social Media Insights',
-    index: '04',
-    type: 'AI analytics experiment',
-    description:
-      'A pre-hackathon analytics module exploring sentiment, keywords, and engagement signals with Langflow and Astra DB.',
-    stack: ['Python', 'Langflow', 'Astra DB'],
-    href: 'https://github.com/bharath-541/Social_media_insights',
+    id: 'samruddhi',
+    idx: '05',
+    name: 'Samruddhi',
+    cat: 'Hackathons',
+    type: 'Hospital Resource & Patient Dashboard',
+    desc: 'Built for Mumbai Hacks 2025 — real-time healthcare ops dashboard managing emergency bed queues, doctor shifts, patient records, and emergency triage routing.',
+    stack: ['React', 'Node.js', 'Healthcare Ops', 'REST APIs'],
+    href: 'https://github.com/bharath-541/Samruddhi_Mumbai_Hacks_25',
+    badge: 'Mumbai Hacks'
   },
   {
-    id: 'conversai',
-    name: 'ConversAI Labs',
-    index: '05',
-    type: 'LLM fine-tuning study',
-    description:
-      'A focused learning project for understanding the practical path from language model data to fine-tuned behavior.',
-    stack: ['Python', 'LLMs', 'Jupyter'],
-    href: 'https://github.com/bharath-541/ConversAIlabs-LLM-finetuning-assignment',
-  },
-]
-
-const learnings = [
-  {
-    icon: 'box',
-    title: 'Ayu backend systems',
-    text: 'Contributing to Django health workflows, ABDM/ABHA integrations, OCR and PDF processing, and production-facing API behavior.',
+    id: 'farmus',
+    idx: '06',
+    name: 'FarmUs',
+    cat: 'Hackathons',
+    type: 'Agritech Marketplace & Advisory',
+    desc: 'Smart India Hackathon (SIH) — agricultural intelligence system connecting regional farmers to verified buyers, crop disease analysis, and dynamic market rates.',
+    stack: ['React', 'Node.js', 'Agriculture', 'SIH'],
+    href: 'https://github.com/Soham-1304/FarmUs_SIH_NullCrew',
+    badge: 'SIH Finalist'
   },
   {
-    icon: 'spark',
-    title: 'AI agents + automation',
-    text: 'Exploring agent frameworks, voice interfaces, and workflows that make everyday productivity feel lighter.',
-  },
-  {
-    icon: 'code',
-    title: 'MERN + Tailwind',
-    text: 'Building full-stack apps with a sharper eye for modern UI, clean information hierarchy, and product feel.',
-  },
-  {
-    icon: 'sigma',
-    title: 'DSA',
-    text: 'Strengthening problem solving and algorithmic thinking one pattern at a time.',
+    id: 'finsight',
+    idx: '07',
+    name: 'FinSight',
+    cat: 'Backend & AI',
+    type: 'Personal Wealth & Budget Engine',
+    desc: 'Full-stack finance architecture tracking liquid assets, recurring EMI schedules, automated debt amortization, and 50/30/20 allocation budgeting.',
+    stack: ['MERN', 'MongoDB', 'Express', 'Node.js'],
+    href: 'https://github.com/bharath-541/FinSight'
   },
 ]
 
-const experiences = [
+const HACKATHONS = [
   {
-    role: 'Founder',
-    company: 'Tibzee',
-    period: 'Jul 2025 — Dec 2025',
-    location: 'Bengaluru / Remote',
-    description: 'Founded Tibzee and shaped an early-learning operations product for preschool teachers and school administrators. Worked across product direction, landing experience, feature storytelling, and the first app workflow.',
-    stack: ['React', 'Tailwind CSS', 'Product direction'],
-    href: '#tibzee',
+    id: 'supermind',
+    name: 'Level SuperMind Hackathon',
+    cls: 'cert',
+    result: '🎖️ Certificate of Skill',
+    desc: 'Engineered a social media performance analytics module utilizing Langflow and DataStax Astra DB. Awarded certificate from FindCoder, AWS & Langflow.',
+    stack: ['Python', 'Langflow', 'Astra DB', 'AWS'],
+    href: 'https://github.com/Soham-1304/Social_media_insights'
   },
   {
-    role: 'Software engineering intern',
-    company: 'Ayu',
-    period: 'Jan 2026 — Present',
-    location: 'Bengaluru / Remote',
-    description: 'Contributing across Ayu’s private backend and dashboard systems, turning complex healthcare workflows into dependable product experiences.',
-    highlights: [
-      'Built ABDM / ABHA and PHR flows for consent, discovery, linking, and health-record exchange.',
-      'Improved OCR, PDF analysis, and document-processing workflows for medical records.',
-      'Shipped real-time WebSocket chat features, medication reminders, WhatsApp automation, and role-aware analytics.',
+    id: 'buildathon',
+    name: 'Buildathon 3.0',
+    cls: 'prize',
+    result: '🥈 Runner-Up · ₹5,000',
+    org: 'ITM Skills University',
+    desc: '"Magic in codes, spells in action." Competed against top university engineering teams and placed runner-up with a ₹5,000 cash prize.',
+    stack: ['Full-stack', 'Backend Architecture']
+  },
+  {
+    id: 'skillify',
+    name: 'Skillify Hackathon',
+    cls: 'prize',
+    result: '🥈 2nd Prize Winner',
+    desc: 'Built an end-to-end career skill-matching and portfolio workflow platform in my first hackathon, winning 2nd prize.',
+    stack: ['Mobile', 'Glide', 'Product Design'],
+    href: 'https://skillify.glide.page/dl/d0a5f4',
+    li: 'https://www.linkedin.com/posts/perni-bharath-raghavendra-522529265_thrilled-to-share-that-my-team-and-i-won-activity-7272181847315390466-My5N',
+    photo: 'images/hack_team1.jpg'
+  },
+  {
+    id: 'hackx',
+    name: 'HackX NMIMS',
+    cls: 'par',
+    result: 'Participant',
+    desc: 'Competed in NMIMS HackX under team NullCrew, delivering a full-stack rapid prototype within 24 hours.',
+    stack: ['React', 'Node.js', 'MongoDB'],
+    href: 'https://github.com/Soham-1304/NullCrew',
+    photo: 'images/hack_team2.jpg'
+  },
+  {
+    id: 'sih',
+    name: 'Smart India Hackathon',
+    cls: 'par',
+    result: 'SIH Finalist',
+    desc: 'Built FarmUs — an agricultural resource and market intelligence platform, representing ITM Skills University.',
+    stack: ['React', 'Node.js', 'Agritech'],
+    href: 'https://github.com/Soham-1304/FarmUs_SIH_NullCrew'
+  },
+  {
+    id: 'mumbai',
+    name: 'Mumbai Hacks 2025',
+    cls: 'par',
+    result: 'Participant',
+    desc: 'Built Samruddhi — hospital operations and resource triage platform during Mumbai Hacks 2025.',
+    stack: ['React', 'Healthcare', 'Node.js'],
+    href: 'https://github.com/bharath-541/Samruddhi_Mumbai_Hacks_25'
+  },
+  {
+    id: 'istd',
+    name: 'ISTD Hackathon',
+    cls: 'par',
+    result: 'Participant',
+    desc: 'Engineered an ROI and training metrics analytics dashboard for corporate learning teams.',
+    stack: ['Analytics', 'Full-stack'],
+    href: 'https://github.com/Soham-1304/ISTD-Hackathon'
+  },
+  {
+    id: 'hackacon',
+    name: 'Hackacon 2025',
+    cls: 'par',
+    result: 'Participant',
+    desc: 'Code, Caffeine, Conquer — fast-paced 24-hour hacker sprint.',
+    stack: ['Full-stack'],
+    photo: 'images/hackacon.jpg'
+  },
+]
+
+const EXPERIENCES = [
+  {
+    role: 'Co-Founder & Product Lead',
+    co: 'Tibzee',
+    period: 'Jul 2025 – Dec 2025',
+    loc: 'Bengaluru / Remote',
+    desc: 'Co-founded a teacher-parent communication and preschool operations platform. Drove customer discovery, product architecture, and go-to-market execution.',
+    hl: [
+      'Pitched directly to 6+ preschool founders and administrators, validating pain points in parent-teacher updates and attendance.',
+      'Secured and ran a 1-month live operational pilot in a school, gathering deep product feedback.',
+      'Architected parent notifications, student progress tracking, daily star rewards, and fee record workflows.',
+      'Navigated early unit economics and market margins in the early-childhood education space.'
     ],
-    stack: ['Django', 'Python', 'WebSockets', 'ABDM / ABHA'],
-    href: profileLinks.linkedin,
+    stack: ['React', 'Tailwind CSS', 'Android', 'Product Discovery', 'Venture Building'],
+    href: '#work'
+  },
+  {
+    role: 'Software Engineering Intern (Backend)',
+    co: 'Ayu',
+    period: 'Jan 2026 — Present',
+    loc: 'Bengaluru / Remote',
+    desc: 'Contributing to Ayu\'s private backend services, clinical workflows, and healthcare data exchange systems.',
+    hl: [
+      'Engineered ABDM / ABHA consent management, health ID discovery, record linking, and PHR exchange pipelines.',
+      'Built automated OCR and PDF analysis pipelines for parsing unstructured medical prescriptions and lab reports.',
+      'Shipped real-time WebSocket chat infrastructure, automated medication reminder queues, and role-based clinical analytics.'
+    ],
+    stack: ['Django', 'Python', 'WebSockets', 'PostgreSQL', 'ABDM / ABHA', 'Celery'],
+    href: L.li
+  },
+  {
+    role: 'Core Platform Contributor',
+    co: 'Namma Turf',
+    period: '2025',
+    loc: 'Mumbai / Remote',
+    desc: 'Contributed to platform architecture and frontend-backend integration for an automated corporate sports league management startup.',
+    hl: [
+      'Built interactive features for match fixtures, league registrations, and corporate team onboarding.',
+      'Engineered responsive interfaces and coordinated API endpoints for real-time score updates.'
+    ],
+    stack: ['React', 'Node.js', 'REST APIs', 'App Development'],
+    href: 'https://www.nammaturf.com/'
   },
 ]
 
-const contributionSnapshot = {
-  main: '00000000000000000100000000000000000000000000000000000000000000000000100000000000010000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000001100000000000000000000000010000000001000000000000000000000000010000000002040000000000000000000000000000000000000000000000100100000000000000000000000001000040000000000000000030000000000000000000000000000200003000',
-  ayu: '00000000000000000000002110010000000000102300000000000000000000000000000000010120100010302000000100000000000000000000000000000000000000000002211010200001100020200000000000000000000120000020103200200000000001100020000000000000000000001021201200012001001110000000103000000000000000000000010121010000002000000010002300000000000000000000000000011020100300000001014001000200',
-  total: 258,
-  period: 'Aug 2025 — Aug 2026',
-}
-
-const techSkills = [
-  { name: 'JavaScript', short: 'JS', icon: 'javascript/javascript-original.svg' },
-  { name: 'TypeScript', short: 'TS', icon: 'typescript/typescript-original.svg' },
-  { name: 'Python', short: 'Py', icon: 'python/python-original.svg' },
-  { name: 'Java', short: 'Java', icon: 'java/java-original.svg' },
-  { name: 'HTML5', short: 'HTML', icon: 'html5/html5-original.svg' },
-  { name: 'CSS3', short: 'CSS', icon: 'css3/css3-original.svg' },
-  { name: 'React', short: 'React', icon: 'react/react-original.svg' },
-  { name: 'Next.js', short: 'Next', icon: 'nextjs/nextjs-original.svg' },
-  { name: 'Node.js', short: 'Node', icon: 'nodejs/nodejs-original.svg' },
-  { name: 'Django', short: 'Django', icon: 'django/django-plain.svg' },
-  { name: 'Express', short: 'Ex', icon: 'express/express-original.svg' },
-  { name: 'GraphQL', short: 'GQL', icon: 'graphql/graphql-plain.svg' },
-  { name: 'Tailwind CSS', short: 'TW', icon: 'tailwindcss/tailwindcss-original.svg' },
-  { name: 'MongoDB', short: 'Mongo', icon: 'mongodb/mongodb-original.svg' },
-  { name: 'Neo4j', short: 'Neo4j', icon: 'neo4j/neo4j-original.svg' },
-  { name: 'MySQL', short: 'SQL', icon: 'mysql/mysql-original.svg' },
-  { name: 'PostgreSQL', short: 'PG', icon: 'postgresql/postgresql-original.svg' },
-  { name: 'Redis', short: 'Redis', icon: 'redis/redis-original.svg' },
-  { name: 'Celery', short: 'Celery', src: 'https://cdn.simpleicons.org/celery' },
-  { name: 'FastAPI', short: 'API', icon: 'fastapi/fastapi-original.svg' },
-  { name: 'Docker', short: 'Docker', icon: 'docker/docker-original.svg' },
-  { name: 'Google Cloud', short: 'GCP', icon: 'googlecloud/googlecloud-original.svg' },
-  { name: 'Flutter', short: 'Flutter', icon: 'flutter/flutter-original.svg' },
-  { name: 'Git', short: 'Git', icon: 'git/git-original.svg' },
-  { name: 'GitHub', short: 'GitHub', icon: 'github/github-original.svg' },
-  { name: 'Figma', short: 'Figma', icon: 'figma/figma-original.svg' },
-  { name: 'Firebase', short: 'Firebase', icon: 'firebase/firebase-plain.svg' },
-  { name: 'Jupyter', short: 'Jup', icon: 'jupyter/jupyter-original.svg' },
-  { name: 'OpenCV', short: 'CV', icon: 'opencv/opencv-original.svg' },
-  { name: 'PyMuPDF', short: 'PDF', src: 'https://cdn.simpleicons.org/adobeacrobatreader' },
-  { name: 'Playwright', short: 'PW', src: 'https://cdn.simpleicons.org/playwright' },
-  { name: 'WebSockets', short: 'WS', src: 'https://cdn.simpleicons.org/socketdotio' },
-  { name: 'LangChain', short: 'LC', src: 'https://cdn.simpleicons.org/langchain' },
-  { name: 'LangGraph', short: 'LG', src: 'https://cdn.simpleicons.org/langgraph' },
-  { name: 'Langflow', short: 'LF', src: 'https://cdn.simpleicons.org/langflow' },
-  { name: 'Qdrant', short: 'Q', src: 'https://cdn.simpleicons.org/qdrant' },
-  { name: 'MCP', short: 'MCP', src: 'https://cdn.simpleicons.org/modelcontextprotocol' },
-  { name: 'OpenAI API', short: 'AI', src: 'https://cdn.jsdelivr.net/gh/simple-icons/simple-icons@latest/icons/openai.svg' },
-  { name: 'Gemini API', short: 'Gem', src: 'https://cdn.simpleicons.org/googlegemini' },
-  { name: 'Groq', short: 'Groq', src: 'https://cdn.simpleicons.org/groq' },
+const EVENTS = [
+  { id: 'devfest', name: 'GDG DevFest Mumbai', type: 'Tech Conference', desc: 'Google Developer Group DevFest — deep dives into Cloud, AI agents, Android, and Mumbai\'s developer ecosystem.' },
+  { id: 'aws', name: 'AWS Community Day Mumbai', type: 'Cloud Summit', desc: 'Oct 11, 2025 — Serverless architectures, generative AI on AWS, distributed pipelines, and cloud networking.' },
+  { id: 'flutter', name: 'FlutterFlow Community Day', type: 'Community Meetup', desc: 'Workshops on rapid application delivery, low-code extensions, and scalable state management.' },
+  { id: 'mtw', name: 'Mumbai Tech Week', type: 'Tech Festival', desc: 'Flagship multi-day summit bringing together startup founders, venture capitalists, and top engineering talent.' },
+  { id: 'ibs', name: 'India Brand Summit 2025', type: 'Leadership Summit', desc: 'Invited delegate representing ITM Skills University — high-level insights into brand growth and scale.' },
+  { id: 'ibex', name: 'IBEX India / SmartTech Asia', type: 'Fintech Trade Fair', desc: '13th International BFSI Technology & Fintech Fair — exploring banking infrastructure, security, and payment rails.' },
 ]
 
-function Arrow({ external = false }) {
-  return <span className="arrow" aria-hidden="true">{external ? '↗' : '→'}</span>
+const SKILLS = [
+  { n: 'Python', i: 'python/python-original.svg' },
+  { n: 'Django', i: 'django/django-plain.svg' },
+  { n: 'FastAPI', i: 'fastapi/fastapi-original.svg' },
+  { n: 'Node.js', i: 'nodejs/nodejs-original.svg' },
+  { n: 'JavaScript', i: 'javascript/javascript-original.svg' },
+  { n: 'TypeScript', i: 'typescript/typescript-original.svg' },
+  { n: 'Java', i: 'java/java-original.svg' },
+  { n: 'PostgreSQL', i: 'postgresql/postgresql-original.svg' },
+  { n: 'MongoDB', i: 'mongodb/mongodb-original.svg' },
+  { n: 'Redis', i: 'redis/redis-original.svg' },
+  { n: 'MySQL', i: 'mysql/mysql-original.svg' },
+  { n: 'Docker', i: 'docker/docker-original.svg' },
+  { n: 'GCP', i: 'googlecloud/googlecloud-original.svg' },
+  { n: 'Git', i: 'git/git-original.svg' },
+  { n: 'WebSockets', s: 'https://cdn.simpleicons.org/socketdotio' },
+  { n: 'LangChain', s: 'https://cdn.simpleicons.org/langchain' },
+  { n: 'Langflow', s: 'https://cdn.simpleicons.org/langflow' },
+  { n: 'OpenAI API', s: 'https://cdn.jsdelivr.net/gh/simple-icons/simple-icons@latest/icons/openai.svg' },
+  { n: 'Groq' },
+  { n: 'OpenCV', i: 'opencv/opencv-original.svg' },
+  { n: 'React', i: 'react/react-original.svg' },
+  { n: 'Next.js', i: 'nextjs/nextjs-original.svg' },
+  { n: 'Tailwind CSS', i: 'tailwindcss/tailwindcss-original.svg' },
+  { n: 'Flutter', i: 'flutter/flutter-original.svg' },
+  { n: 'Firebase', i: 'firebase/firebase-plain.svg' },
+  { n: 'GraphQL', i: 'graphql/graphql-plain.svg' },
+  { n: 'Playwright', i: 'playwright/playwright-original.svg' },
+]
+
+const C = {
+  m: '00000000000000000100000000000000000000000000000000000000000000000000100000000000010000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000001100000000000000000000000010000000001000000000000000000000000010000000002040000000000000000000000000000000000000000000000100100000000000000000000000001000040000000000000000030000000000000000000000000000200003000',
+  a: '00000000000000000000002110010000000000102300000000000000000000000000000000010120100010302000000100000000000000000000000000000000000000000002211010200001100020200000000000000000000120000020103200200000000001100020000000000000000000001021201200012001001110000000103000000000000000000000010121010000002000000010002300000000000000000000000000011020100300000001014001000200',
 }
 
-function Icon({ name }) {
-  const paths = {
-    box: <><path d="M12 3.5 19 7.4v9.2L12 20.5 5 16.6V7.4L12 3.5Z" /><path d="m5.3 7.5 6.7 3.8 6.7-3.8M12 11.3v9" /></>,
-    spark: <><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8" /><circle cx="12" cy="12" r="3.2" /></>,
-    code: <><path d="m8.5 7-5 5 5 5M15.5 7l5 5-5 5M13.5 4 10.5 20" /></>,
-    sigma: <path d="M19 4H6l7.4 8L6 20h13" />,
-    mail: <><rect x="3" y="5" width="18" height="14" rx="1" /><path d="m4 7 8 6 8-6" /></>,
-    pin: <><path d="M19 10c0 5-7 10-7 10S5 15 5 10a7 7 0 1 1 14 0Z" /><circle cx="12" cy="10" r="2.3" /></>,
-    github: <><path d="M9 19c-4 .9-4-2-5.5-2.5M14.5 21v-3.5c0-1 .1-1.5-.5-2 2.1-.2 4.3-1 4.3-4.8 0-1-.4-1.9-1-2.6.1-.2.5-1.2-.1-2.5 0 0-.8-.3-2.7 1a9.6 9.6 0 0 0-5 0c-1.9-1.3-2.7-1-2.7-1-.6 1.3-.2 2.3-.1 2.5-.6.7-1 1.6-1 2.6 0 3.8 2.2 4.6 4.3 4.8-.6.5-.6 1.1-.6 2V21" /></>,
-    linkedin: <><path d="M5 8v9M5 5.2v.1M9.5 17v-5.2a3 3 0 0 1 6 0V17M9.5 9.5V17M19 17v-5.2a3 3 0 0 0-6-1.8" /></>,
-    sun: <><circle cx="12" cy="12" r="3.4" /><path d="M12 2.5v2M12 19.5v2M4.7 4.7l1.4 1.4M17.9 17.9l1.4 1.4M2.5 12h2M19.5 12h2M4.7 19.3l1.4-1.4M17.9 6.1l1.4-1.4" /></>,
-    moon: <path d="M20.2 15.2A8.4 8.4 0 0 1 8.8 3.8 8.5 8.5 0 1 0 20.2 15.2Z" />,
+const AI_USAGE = {
+  updated: '19 Aug 2026',
+  combined: 6830387901,
+  claude: {
+    total: 4930387901,
+    input: 3297402,
+    output: 16429706,
+    cacheRead: 4561437695,
+    cacheWrite: 349223098,
+    messages: 66216,
+    sessions: 191,
+    activeDays: 84,
+    longestSession: '6d 8h 28m',
+    models: [
+      { name: 'Sonnet 4.6', tokens: 2223840466 },
+      { name: 'Sonnet 5', tokens: 1216587508 },
+      { name: 'Sonnet 4.5', tokens: 962984250 },
+      { name: 'Haiku 4.5', tokens: 277502883 },
+      { name: 'Opus 4.7', tokens: 242395857 },
+      { name: 'Opus 4.8', tokens: 7076937 },
+    ],
+  },
+  codex: {
+    tokens: 1900000000,
+    peakTokens: 219400000,
+    chats: 415,
+    currentStreak: 5,
+    longestStreak: 27,
+    skillsUsed: 225,
+  },
+}
+
+const compactNumber = value => {
+  if (value >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(2)}B`
+  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`
+  if (value >= 1_000) return `${(value / 1_000).toFixed(value >= 100_000 ? 0 : 1)}K`
+  return String(value)
+}
+
+/* ── Tiny Icons ────────────────────────────────────────── */
+function Ico({ n }) {
+  const p = {
+    gh:   <path d="M9 19c-4 .9-4-2-5.5-2.5M14.5 21v-3.5c0-1 .1-1.5-.5-2 2.1-.2 4.3-1 4.3-4.8 0-1-.4-1.9-1-2.6.1-.2.5-1.2-.1-2.5 0 0-.8-.3-2.7 1a9.6 9.6 0 0 0-5 0c-1.9-1.3-2.7-1-2.7-1-.6 1.3-.2 2.3-.1 2.5-.6.7-1 1.6-1 2.6 0 3.8 2.2 4.6 4.3 4.8-.6.5-.6 1.1-.6 2V21"/>,
+    li:   <path d="M5 8v9M5 5.2v.1M9.5 17v-5.2a3 3 0 0 1 6 0V17M9.5 9.5V17M19 17v-5.2a3 3 0 0 0-6-1.8"/>,
+    mail: <><rect x="3" y="5" width="18" height="14" rx="1"/><path d="m4 7 8 6 8-6"/></>,
+    dl:   <path d="M12 3v13M8 13l4 4 4-4M3 19h18"/>,
+    sun:  <><circle cx="12" cy="12" r="3.4"/><path d="M12 2.5v2M12 19.5v2M4.7 4.7l1.4 1.4M17.9 17.9l1.4 1.4M2.5 12h2M19.5 12h2M4.7 19.3l1.4-1.4M17.9 6.1l1.4-1.4"/></>,
+    moon: <path d="M20.2 15.2A8.4 8.4 0 0 1 8.8 3.8 8.5 8.5 0 1 0 20.2 15.2Z"/>,
+    menu: <path d="M3 12h18M3 6h18M3 18h18"/>,
+    x:    <path d="M18 6 6 18M6 6l12 12"/>,
+    ext:  <path d="M7 17 17 7M7 7h10v10"/>,
   }
-  return <svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.45" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      {p[n]}
+    </svg>
+  )
 }
 
-function SkillLogo({ skill }) {
+function Preview({ url }) {
+  const [err, setErr] = useState(false)
+  if (!url || err) return null
   return (
-    <div className="skill-item" title={skill.name}>
-      <div className="skill-logo">
-        <span className="skill-logo-fallback">{skill.short}</span>
-        <img src={skill.src ?? `https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${skill.icon}`} alt="" loading="lazy" onError={(event) => event.currentTarget.parentElement.classList.add('broken')} />
+    <div className="proj-preview">
+      <iframe src={url} title="preview" sandbox="allow-scripts allow-same-origin" loading="lazy" onError={() => setErr(true)} />
+      <div className="proj-preview-ov" />
+    </div>
+  )
+}
+
+function Chip({ s }) {
+  const icon = s.s ?? (s.i ? `https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${s.i}` : null)
+  return (
+    <div className={`chip${icon ? '' : ' broken'}`}>
+      {icon ? <img src={icon} alt="" loading="lazy"
+        onError={e => e.currentTarget.closest('.chip').classList.add('broken')} /> : null}
+      <span className="chip-fb">{s.n[0]}</span>
+      {s.n}
+    </div>
+  )
+}
+
+function ContribPulse() {
+  const cells = useMemo(() => Array.from(
+    { length: Math.max(C.m.length, C.a.length) },
+    (_, i) => Math.max(Number(C.m[i] ?? 0), Number(C.a[i] ?? 0))
+  ), [])
+  const weeks = useMemo(() => Array.from({ length: Math.ceil(cells.length / 7) }, (_, i) => cells.slice(i * 7, i * 7 + 7).reduce((sum, value) => sum + value, 0)), [cells])
+  const recentWeeks = weeks.slice(-52)
+  const maxWeek = Math.max(...recentWeeks, 1)
+  return (
+    <div className="contribution-pulse">
+      <div className="pulse-head"><span>Weekly contribution pulse</span><span>Aug 2025 — Aug 2026</span></div>
+      <div className="pulse-chart" aria-label="Combined weekly contribution activity">
+        <div className="pulse-scale"><span>HIGH</span><span>LOW</span></div>
+        <div className="pulse-bars">{recentWeeks.map((value, index) => <span key={index} className="pulse-bar" style={{ height: `${Math.max(8, (value / maxWeek) * 100)}%` }} />)}</div>
       </div>
-      <span>{skill.name}</span>
+      <div className="pulse-labels">{['Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'].map(m => <span key={m}>{m}</span>)}</div>
+      <div className="pulse-legend"><span className="pulse-dot" /> merged activity from both GitHub identities</div>
     </div>
   )
 }
 
-function TerminalField() {
-  const glyphs = useMemo(() => {
-    const chars = '01{}[]<>/\\$#@%*+=~'.split('')
-    return Array.from({ length: 94 }, (_, index) => ({
-      id: index,
-      char: chars[(index * 13 + 5) % chars.length],
-      left: `${8 + ((index * 37) % 88)}%`,
-      top: `${12 + ((index * 17) % 76)}%`,
-      delay: `${(index % 9) * -0.48}s`,
-      opacity: 0.12 + ((index * 11) % 40) / 100,
-    }))
-  }, [])
+function AIUsage() {
+  const maxModel = AI_USAGE.claude.models[0].tokens
 
   return (
-    <div className="terminal-field" aria-hidden="true">
-      <div className="terminal-label terminal-label-one"><span>›</span> init</div>
-      <div className="terminal-label terminal-label-two"><span>›</span> build</div>
-      {glyphs.map((glyph) => <span key={glyph.id} className="terminal-glyph" style={{ left: glyph.left, top: glyph.top, animationDelay: glyph.delay, opacity: glyph.opacity }}>{glyph.char}</span>)}
+    <div className="ai-usage-block">
+      <div className="ai-usage-head">
+        <div>
+          <span className="ai-kicker">AI build telemetry</span>
+          <h3>Tokens behind the work.</h3>
+        </div>
+        <p>Aggregated local usage only. No prompts, conversations, or repository content are exposed.</p>
+      </div>
+
+      <div className="ai-metrics">
+        <div className="ai-metric"><strong>{compactNumber(AI_USAGE.combined)}+</strong><span>combined tracked tokens</span></div>
+        <div className="ai-metric"><strong>{compactNumber(AI_USAGE.claude.total)}</strong><span>Claude Code</span></div>
+        <div className="ai-metric"><strong>{compactNumber(AI_USAGE.codex.tokens)}</strong><span>Codex lifetime</span></div>
+        <div className="ai-metric"><strong>{AI_USAGE.codex.chats}</strong><span>Codex chats</span></div>
+      </div>
+
+      <div className="ai-usage-grid">
+        <div className="model-usage">
+          <div className="ai-panel-label">Claude model mix</div>
+          {AI_USAGE.claude.models.map(model => (
+            <div className="model-row" key={model.name}>
+              <div className="model-row-copy"><span>{model.name}</span><span>{compactNumber(model.tokens)}</span></div>
+              <div className="model-track"><span style={{ width: `${Math.max(2, (model.tokens / maxModel) * 100)}%` }} /></div>
+            </div>
+          ))}
+        </div>
+
+        <div className="usage-ledger">
+          <div className="ai-panel-label">Local snapshot</div>
+          <div className="usage-line"><span>Cache read</span><strong>{compactNumber(AI_USAGE.claude.cacheRead)}</strong></div>
+          <div className="usage-line"><span>Cache created</span><strong>{compactNumber(AI_USAGE.claude.cacheWrite)}</strong></div>
+          <div className="usage-line"><span>Input / output</span><strong>{compactNumber(AI_USAGE.claude.input)} / {compactNumber(AI_USAGE.claude.output)}</strong></div>
+          <div className="usage-line"><span>Longest Claude session</span><strong>{AI_USAGE.claude.longestSession}</strong></div>
+          <div className="usage-line"><span>Codex peak / streak</span><strong>{compactNumber(AI_USAGE.codex.peakTokens)} / {AI_USAGE.codex.longestStreak}d</strong></div>
+          <div className="usage-line"><span>Codex skill runs</span><strong>{AI_USAGE.codex.skillsUsed}</strong></div>
+          <div className="usage-source">Claude Code local stats + Codex profile snapshot · rounded totals · {AI_USAGE.updated}</div>
+        </div>
+      </div>
     </div>
   )
 }
 
-function SectionTitle({ children, detail }) {
-  return (
-    <div className="section-title">
-      <h2>{children}</h2>
-      {detail && <p>{detail}</p>}
-    </div>
-  )
-}
+/* ══════════════════════════════════════════════════════════
+   MAIN APPLICATION
+══════════════════════════════════════════════════════════ */
+const CATS = ['All', 'Ventures & Startups', 'Backend & AI', 'Hackathons']
 
-function App() {
-  const [selectedProject, setSelectedProject] = useState(projects[0])
-  const [sent, setSent] = useState(false)
-  const [theme, setTheme] = useState(() => {
-    if (typeof window === 'undefined') return 'dark'
-    return localStorage.getItem(themeStorageKey) || 'dark'
-  })
+export default function App() {
+  const [activeNav, setActiveNav]   = useState('About')
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [filter, setFilter]         = useState('All')
+  const [sent, setSent]             = useState(false)
+  const [theme, setTheme]           = useState(
+    () => typeof window !== 'undefined' ? (localStorage.getItem('pbr-theme-v4') ?? 'dark') : 'dark'
+  )
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
-    localStorage.setItem(themeStorageKey, theme)
+    localStorage.setItem('pbr-theme-v4', theme)
   }, [theme])
 
   useEffect(() => {
-    const handleHash = () => {
-      if (window.location.hash) {
-        const target = document.querySelector(window.location.hash)
-        target?.scrollIntoView({ behavior: 'smooth' })
-      }
-    }
-    window.addEventListener('hashchange', handleHash)
-    return () => window.removeEventListener('hashchange', handleHash)
+    const target = window.location.hash.slice(1)
+    if (!target) return
+    const timer = window.setTimeout(() => document.getElementById(target)?.scrollIntoView(), 250)
+    return () => window.clearTimeout(timer)
   }, [])
 
-  const scrollTo = (id) => {
+  useEffect(() => {
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const i = NIDS.indexOf(e.target.id)
+          if (i >= 0) setActiveNav(NAV[i])
+        }
+      })
+    }, { threshold: 0.2 })
+    NIDS.forEach(id => { const el = document.getElementById(id); if (el) obs.observe(el) })
+    return () => obs.disconnect()
+  }, [])
+
+  const scroll = id => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+    setMobileOpen(false)
   }
 
+  const filtered = filter === 'All' ? PROJECTS : PROJECTS.filter(p => p.cat === filter)
+
   return (
-    <div className="site-shell">
-      <header className="topbar">
-        <a className="wordmark" href="#top" aria-label="Back to the top">Perni Bharath Raghavendra</a>
-        <nav className="desktop-nav" aria-label="Primary navigation">
-          <button onClick={() => scrollTo('work')}>Work</button>
-          <button onClick={() => scrollTo('learning')}>Learning</button>
-          <button onClick={() => scrollTo('experience')}>Experience</button>
-          <button onClick={() => scrollTo('tibzee')}>Tibzee</button>
-          <button onClick={() => scrollTo('stack')}>Stack</button>
-          <button onClick={() => scrollTo('contact')}>Contact</button>
-        </nav>
-        <div className="topbar-actions">
-          <button className="theme-toggle" type="button" aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`} aria-pressed={theme === 'dark'} onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}><Icon name={theme === 'dark' ? 'sun' : 'moon'} /><span>{theme === 'dark' ? 'Light' : 'Dark'}</span></button>
-          <button className="menu-button" aria-label="Scroll to contact" onClick={() => scrollTo('contact')}><span></span><span></span><span></span></button>
+    <>
+      <div className="grid-bg" aria-hidden="true" />
+
+      {/* ── Navbar ────────────────────────────────────────── */}
+      <nav className="navbar">
+        <div className="nav-logo" onClick={() => scroll('top')} role="button" tabIndex={0} aria-label="Top">BR</div>
+
+        <div className="nav-center">
+          {NAV.map((n, i) => (
+            <button key={n} className={`nav-lnk ${activeNav === n ? 'on' : ''}`} onClick={() => scroll(NIDS[i])}>{n}</button>
+          ))}
         </div>
-      </header>
 
-      <main id="top">
-        <section className="hero dark-section">
-          <TerminalField />
-          <div className="hero-content page-width">
-            <div className="hero-copy">
-              <h1>I build useful<br />things while<br />figuring out how<br />they work.</h1>
-              <p>CSE undergrad building AI tools, full-stack apps, and automation workflows.</p>
-              <div className="hero-actions">
-                <button className="button button-primary" onClick={() => scrollTo('work')}>See the work <Arrow /></button>
-                <a className="button button-outline" href={profileLinks.primaryGithub} target="_blank" rel="noreferrer">Open GitHub <Arrow external /></a>
-              </div>
-            </div>
-            <div className="hero-aside">
-              <span>01 — 04</span>
-              <p>Learning in public.<br />Shipping small.<br />Iterating always.</p>
-            </div>
+        <div className="nav-right">
+          <a className="nav-resume" href={L.cv} download target="_blank" rel="noreferrer">
+            <Ico n="dl" /><span>Résumé</span>
+          </a>
+          <a className="nav-ico" href={L.gh} target="_blank" rel="noreferrer" aria-label="GitHub"><Ico n="gh" /></a>
+          <button className="nav-ico" onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} aria-label="Toggle theme">
+            <Ico n={theme === 'dark' ? 'sun' : 'moon'} />
+          </button>
+          <button className="nav-ico nav-burger" onClick={() => setMobileOpen(o => !o)} aria-label="Menu">
+            <Ico n={mobileOpen ? 'x' : 'menu'} />
+          </button>
+        </div>
+      </nav>
+
+      {mobileOpen && (
+        <div className="mob-nav">
+          {NAV.map((n, i) => (
+            <button key={n} className={`nav-lnk ${activeNav === n ? 'on' : ''}`} onClick={() => scroll(NIDS[i])}>
+              {n}
+            </button>
+          ))}
+          <div style={{ marginTop: 24 }}>
+            <a className="btn btn-solid" href={L.cv} download>
+              <Ico n="dl" /> Download Résumé
+            </a>
           </div>
-          <div className="scroll-note page-width"><span>Scroll to explore</span><span className="scroll-line"></span></div>
-        </section>
+        </div>
+      )}
 
-        <section className="section light-section work-section" id="work">
-          <div className="page-width">
-            <SectionTitle detail="A few things I’ve built and shipped.">Selected work</SectionTitle>
-            <div className="work-layout">
-              <div className="project-list" role="list" aria-label="Projects">
-                {projects.map((project) => (
-                  <button className={`project-row ${selectedProject.id === project.id ? 'selected' : ''}`} key={project.id} onClick={() => setSelectedProject(project)}>
-                    <span className="project-index">{project.index}</span>
-                    <span className="project-name">{project.name}</span>
-                    <Arrow />
-                  </button>
-                ))}
-              </div>
-              <article className="project-detail" aria-live="polite">
-                <div className="detail-kicker">{selectedProject.type}</div>
-                <h3>{selectedProject.name}</h3>
-                <p>{selectedProject.description}</p>
-                <div className="stack-list">{selectedProject.stack.map((item) => <span key={item}>{item}</span>)}</div>
-                <div className="project-links">
-                  <a className="text-link" href={selectedProject.id === 'tibzee' ? '#tibzee' : selectedProject.href} target={selectedProject.id === 'tibzee' ? undefined : '_blank'} rel={selectedProject.id === 'tibzee' ? undefined : 'noreferrer'}>{selectedProject.id === 'tibzee' ? 'Open product page' : 'View project'} <Arrow external /></a>
-                  {selectedProject.sourceHref && <a className="text-link subtle-link" href={selectedProject.sourceHref} target="_blank" rel="noreferrer">View source <Arrow external /></a>}
+      <div className="site">
+
+        {/* ── Hero ──────────────────────────────────────── */}
+        <section className="hero-section" id="top">
+          <div className="wrap hero-wrap">
+            <div className="hero-main">
+              <div className="hero-copy">
+                <span className="hero-label">Backend &amp; AI Systems · Founder &amp; Venture Builder</span>
+                <h1 className="hero-name">Perni Bharath<br />Raghavendra</h1>
+                <div className="hero-sub">Backend Infrastructure, AI Pipelines &amp; Entrepreneurship</div>
+                <p className="hero-p">
+                  I architect high-performance backend systems, intelligent AI workflows, and scale products from idea to production with a relentless entrepreneurial drive.
+                </p>
+                <div className="hero-btns">
+                  <button className="btn btn-solid" onClick={() => scroll('work')}>View My Work →</button>
+                  <a className="btn btn-outline" href={L.gh} target="_blank" rel="noreferrer">GitHub ↗</a>
+                  <a className="btn btn-outline" href={L.li} target="_blank" rel="noreferrer">LinkedIn ↗</a>
                 </div>
-              </article>
-            </div>
-          </div>
-        </section>
-
-        <section className="section tibzee-section" id="tibzee">
-          <div className="page-width">
-            <div className="product-page-head">
-              <div className="product-brand"><img src={profileLinks.tibzeeLogo} alt="Tibzee" /><span>Product page</span></div>
-              <div className="product-page-actions"><a className="button button-dark" href={profileLinks.tibzeePlay} target="_blank" rel="noreferrer">Open on Google Play <Arrow external /></a><a className="text-link" href={profileLinks.tibzeeLive} target="_blank" rel="noreferrer">Visit landing page <Arrow external /></a></div>
-            </div>
-            <div className="tibzee-hero-grid">
-              <div>
-                <h2>Making preschool operations feel lighter.</h2>
-                <p>Tibzee brings attendance, reports, parent communication, classroom activities, rewards, and admin visibility into one calm workflow for early-learning teams.</p>
-                <div className="tibzee-meta"><span>Founder</span><span>Jul 2025 — Dec 2025</span><span>React · Tailwind · Android</span></div>
               </div>
-              <div className="product-preview"><div className="preview-bar"><span></span><span></span><span></span></div><div className="preview-screen"><div className="preview-heading">Good morning, teacher.</div><div className="preview-cards"><div className="preview-card pink"><strong>Attendance</strong><span>24 present today</span></div><div className="preview-card yellow"><strong>Stars</strong><span>Celebrate progress</span></div><div className="preview-card green"><strong>Reports</strong><span>Ready to share</span></div></div><div className="preview-footer">Tibzee · simple tools for meaningful classrooms</div></div></div>
+              <aside className="hero-aside">
+                <div className="hero-aside-top"><span>BUILD LOG</span><span>2025 — NOW</span></div>
+                <div className="hero-aside-mark">&lt;/&gt;</div>
+                <p>Systems that move<br />from idea to impact.</p>
+                <div className="hero-aside-lines"><span>01 · Ship the useful thing</span><span>02 · Measure what matters</span><span>03 · Keep learning</span></div>
+              </aside>
             </div>
-            <div className="product-feature-row"><div className="product-feature-intro"><span>01 — 04</span><h3>The product I helped shape.</h3></div><div className="product-feature-list"><div><strong>Smart attendance</strong><span>Mark check-in and check-out in seconds, with parent-ready updates.</span></div><div><strong>Professional reports</strong><span>Turn observations and activities into calm, printable progress reports.</span></div><div><strong>Message drafts</strong><span>Generate WhatsApp-ready updates without starting every message from zero.</span></div><div><strong>Classroom engagement</strong><span>Use stars and activity suggestions to make progress visible and motivating.</span></div></div></div>
+            <div className="hero-stats">
+              <div className="st">
+                <span className="st-n">Tibzee</span>
+                <span className="st-l">Co-Founder</span>
+                <span className="st-desc">Pitched 6+ preschools · Live pilot</span>
+              </div>
+              <div className="st">
+                <span className="st-n">Ayu</span>
+                <span className="st-l">SWE Intern</span>
+                <span className="st-desc">ABDM/ABHA · OCR · WebSockets</span>
+              </div>
+              <div className="st">
+                <span className="st-n">8+</span>
+                <span className="st-l">Hackathons</span>
+                <span className="st-desc">2 Prizes Won · SuperMind Cert</span>
+              </div>
+              <div className="st">
+                <span className="st-n">258</span>
+                <span className="st-l">Contributions</span>
+                <span className="st-desc">Aug 2025 – Aug 2026 combined</span>
+              </div>
+            </div>
+          </div>
+          <div className="hero-scroll" aria-hidden="true">
+            <span>SCROLL</span>
+            <span className="scrl-line" />
           </div>
         </section>
 
-        <section className="section learning-section" id="learning">
-          <div className="page-width">
-            <SectionTitle detail="Notes, experiments, and steady progress.">What I’m learning</SectionTitle>
-            <div className="learning-grid">
-              <div className="learning-list">
-                {learnings.map((learning) => (
-                  <div className="learning-row" key={learning.title}>
-                    <Icon name={learning.icon} />
-                    <div><h3>{learning.title}</h3><p>{learning.text}</p></div>
+        {/* ── About ─────────────────────────────────────── */}
+        <section className="section" id="about">
+          <div className="wrap">
+            <div className="sh">
+              <span className="sh-kick">About Me</span>
+              <h2 className="sh-title">Engineering Systems &amp; Building Ventures</h2>
+              <p className="sh-sub">A blend of robust backend engineering, autonomous AI workflows, and zero-to-one startup grit.</p>
+            </div>
+            <div className="about-grid">
+              <div>
+                <div className="about-body">
+                  <p>
+                    Hey, I'm <strong>Perni Bharath Raghavendra</strong> — a Computer Science undergrad at <strong>ITM Skills University, Mumbai</strong>. My focus centers on <strong>backend distributed systems</strong>, <strong>AI-driven pipelines</strong>, and <strong>practical product building</strong>.
+                  </p>
+                  <p>
+                    As the <strong>Co-Founder of Tibzee</strong>, I took a preschool operations and parent communication platform from concept to market: pitched to <strong>6+ preschool founders</strong>, ran a 1-month live operational pilot, and learned firsthand about unit economics and B2B sales cycles.
+                  </p>
+                  <p>
+                    Currently, I'm a <strong>Software Engineering Intern at Ayu</strong>, where I develop healthcare backend systems, national ABDM/ABHA protocol integrations, medical OCR analysis pipelines, and real-time WebSocket communications.
+                  </p>
+                </div>
+                <div className="fact-table">
+                  <div className="fact-row"><span className="fk">Education</span><span className="fv">ITM Skills University, Mumbai (CSE)</span></div>
+                  <div className="fact-row"><span className="fk">CGPA</span><span className="fv">9.44 / 10</span></div>
+                  <div className="fact-row"><span className="fk">Current Role</span><span className="fv">Software Engineering Intern @ Ayu</span></div>
+                  <div className="fact-row"><span className="fk">Venture</span><span className="fv">Co-Founder @ Tibzee (Preschool SaaS)</span></div>
+                  <div className="fact-row"><span className="fk">Core Focus</span><span className="fv">Backend Architectures · AI Pipelines · Product Strategy</span></div>
+                </div>
+              </div>
+              <div className="lnk-stack">
+                <a href={L.li} target="_blank" rel="noreferrer" className="lnk-row">
+                  <div className="lnk-row-l"><Ico n="li" /><span>LinkedIn — Perni Bharath Raghavendra</span></div>
+                  <span className="lnk-arr">↗</span>
+                </a>
+                <a href={L.gh} target="_blank" rel="noreferrer" className="lnk-row">
+                  <div className="lnk-row-l"><Ico n="gh" /><span>GitHub Primary — @bharath-541</span></div>
+                  <span className="lnk-arr">↗</span>
+                </a>
+                <a href={L.ayugh} target="_blank" rel="noreferrer" className="lnk-row">
+                  <div className="lnk-row-l"><Ico n="gh" /><span>GitHub Organization — @bharath-ayu</span></div>
+                  <span className="lnk-arr">↗</span>
+                </a>
+                <a href={L.mail} className="lnk-row">
+                  <div className="lnk-row-l"><Ico n="mail" /><span>pernibharath15@gmail.com</span></div>
+                  <span className="lnk-arr">↗</span>
+                </a>
+                <a href={L.cv} download target="_blank" rel="noreferrer" className="lnk-row res">
+                  <div className="lnk-row-l"><Ico n="dl" /><span>Download Official Résumé</span></div>
+                  <span className="lnk-arr">↗</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Work ──────────────────────────────────────── */}
+        <section className="section section-off" id="work">
+          <div className="wrap">
+            <div className="sh">
+              <span className="sh-kick">Featured Work</span>
+              <h2 className="sh-title">Startups, AI &amp; Backend Systems</h2>
+              <p className="sh-sub">Production applications, AI architectures, venture pilots, and hackathon prototypes.</p>
+            </div>
+            <div className="filter-bar">
+              {CATS.map(c => (
+                <button
+                  key={c}
+                  className={`ftab ${filter === c ? 'on' : ''}`}
+                  onClick={() => setFilter(c)}
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
+            <div className="proj-grid">
+              {filtered.map(p => (
+                <article className="proj-card" key={p.id}>
+                  <div className="proj-top" />
+                  {p.badge && <div className="proj-badge">{p.badge}</div>}
+                  <div className="proj-inner">
+                    <div className="proj-kick">{p.type}</div>
+                    <div className="proj-name">{p.name}</div>
+                    <div className="proj-desc">{p.desc}</div>
+                    <div className="tags">
+                      {p.stack.map(s => <span key={s} className="tag">{s}</span>)}
+                    </div>
+                    <div className="proj-foot">
+                      <a href={p.href} target="_blank" rel="noreferrer" className="tl">
+                        View project <Ico n="ext" />
+                      </a>
+                      {p.source && (
+                        <a href={p.source} target="_blank" rel="noreferrer" className="tl dim">
+                          Live site <Ico n="ext" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                  <Preview url={p.preview} />
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── Hackathons & Certifications ────────────────── */}
+        <section className="section" id="hackathons">
+          <div className="wrap">
+            <div className="sh">
+              <span className="sh-kick">Hackathons &amp; Honors</span>
+              <h2 className="sh-title">8 Hackathons · 2 Prizes · 1 National Cert</h2>
+              <p className="sh-sub">Fast-paced engineering under 24–48 hour sprints, building functional AI systems and distributed backends.</p>
+            </div>
+
+            {/* SuperMind Certificate */}
+            <div className="cert-card">
+              <img src={asset('images/supermind_cert.jpg')} alt="Level SuperMind Certificate" className="cert-img" />
+              <div>
+                <div className="cert-pill">🎖️ Official Certificate — Level SuperMind Hackathon 2025</div>
+                <div className="cert-title">Level SuperMind Hackathon (AI Analytics)</div>
+                <p className="cert-desc">
+                  Awarded by <strong>FindCoder</strong>, <strong>AWS</strong> &amp; <strong>Langflow</strong> for outstanding technical execution, AI agent workflows, and vector-embedded analytics using Langflow and DataStax Astra DB.
+                </p>
+                <a href="https://github.com/Soham-1304/Social_media_insights" target="_blank" rel="noreferrer" className="tl">
+                  View GitHub Repository <Ico n="ext" />
+                </a>
+              </div>
+            </div>
+
+            {/* Buildathon Win */}
+            <div className="cert-card">
+              <img src={asset('images/buildathon_win.jpg')} alt="Buildathon 3.0 Runner-Up" className="cert-img" />
+              <div>
+                <div className="cert-pill">🥈 Runner-Up · ₹5,000 Cash Prize — Buildathon 3.0</div>
+                <div className="cert-title">Buildathon 3.0 — ITM Skills University</div>
+                <p className="cert-desc">
+                  "Magic in codes, spells in action." Competed against competitive collegiate teams across universities, securing the runner-up position and ₹5,000 in prize money.
+                </p>
+              </div>
+            </div>
+
+            <div className="hack-grid">
+              {HACKATHONS.map(h => (
+                <div className={`hcard ${h.cls}`} key={h.id}>
+                  <div className="hcard-top">
+                    <div>
+                      <div className="hname">{h.name}</div>
+                      {h.org && <div className="horg">{h.org}</div>}
+                    </div>
+                    <div className={`hpill ${h.cls}`}>{h.result}</div>
+                  </div>
+                  <p className="hdesc">{h.desc}</p>
+                  {h.stack.length > 0 && (
+                    <div className="htags">
+                      {h.stack.map(s => <span key={s} className="tag">{s}</span>)}
+                    </div>
+                  )}
+                  {h.photo && (
+                    <div className="hphoto">
+                      <img src={asset(h.photo)} alt={h.name} loading="lazy" />
+                    </div>
+                  )}
+                  <div className="hlinks">
+                    {h.href && (
+                      <a href={h.href} target="_blank" rel="noreferrer" className="tl">
+                        View project <Ico n="ext" />
+                      </a>
+                    )}
+                    {h.li && (
+                      <a href={h.li} target="_blank" rel="noreferrer" className="tl dim">
+                        LinkedIn ↗
+                      </a>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── Experience & Entrepreneurship ──────────────── */}
+        <section className="section section-off" id="experience">
+          <div className="wrap">
+            <div className="sh">
+              <span className="sh-kick">Experience</span>
+              <h2 className="sh-title">Startup Ventures &amp; Engineering Roles</h2>
+              <p className="sh-sub">Commercial software development, startup founding, and high-stakes healthcare infrastructure.</p>
+            </div>
+            <div className="exp-list">
+              {EXPERIENCES.map(exp => (
+                <div className="exp-card" key={exp.co}>
+                  <div className="exp-l">
+                    <span className="exp-role">{exp.role}</span>
+                    <span className="exp-co">{exp.co}</span>
+                    <span className="exp-per">{exp.period}</span>
+                    <span className="exp-loc">{exp.loc}</span>
+                    <a href={exp.href} target={exp.href.startsWith('#') ? undefined : '_blank'} rel={exp.href.startsWith('#') ? undefined : 'noreferrer'} className="exp-lnk">
+                      {exp.href.startsWith('#') ? 'View Work' : 'LinkedIn Profile'} <Ico n="ext" />
+                    </a>
+                  </div>
+                  <div className="exp-r">
+                    <p className="exp-desc">{exp.desc}</p>
+                    {exp.hl && (
+                      <div className="exp-hl">
+                        {exp.hl.map(h => <div key={h} className="exp-hli">{h}</div>)}
+                      </div>
+                    )}
+                    <div className="tags">
+                      {exp.stack.map(s => <span key={s} className="tag">{s}</span>)}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── Tech Stack ─────────────────────────────────── */}
+        <section className="section section-dark" id="stack">
+          <div className="wrap">
+            <div className="sh">
+              <span className="sh-kick dark-sh-kick">Toolbox</span>
+              <h2 className="sh-title dark-sh-title">Technologies &amp; Systems Architecture</h2>
+              <p className="sh-sub dark-sh-sub">Languages, backend frameworks, data stores, AI agent tooling, and cloud infrastructure.</p>
+            </div>
+            <div className="chips">
+              {SKILLS.map(s => <Chip key={s.n} s={s} />)}
+            </div>
+
+            <div className="contrib-block">
+              <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 16, color: 'rgba(240,240,240,.75)' }}>
+                GitHub Activity Matrix — bharath-541 + bharath-ayu
+              </div>
+              <div className="contrib-nums">
+                <div className="cn"><strong>258</strong><span>contributions</span></div>
+                <div className="cn"><strong>141</strong><span>local commits</span></div>
+                <div className="cn"><strong>3</strong><span>private org repos</span></div>
+              </div>
+              <ContribPulse />
+              <p style={{ marginTop: 14, color: 'rgba(240,240,240,.32)', fontSize: 11, lineHeight: 1.65 }}>
+                Combined Aug 2025 – Aug 2026 · Includes private repositories across ABDM/ABHA healthcare integrations, OCR document processing pipelines, WebSocket chat services, and automated notification engines.
+              </p>
+            </div>
+            <AIUsage />
+          </div>
+        </section>
+
+        {/* ── Events & Community ────────────────────────── */}
+        <section className="section" id="events">
+          <div className="wrap">
+            <div className="sh">
+              <span className="sh-kick">Community &amp; Tech Ecosystem</span>
+              <h2 className="sh-title">Events, Meetups &amp; Summits</h2>
+              <p className="sh-sub">Actively participating in Mumbai's developer ecosystem, cloud communities, and tech trade fairs.</p>
+            </div>
+            <div className="events-grid">
+              <div className="ev-list">
+                {EVENTS.map(ev => (
+                  <div className="ev-card" key={ev.id}>
+                    <div className="ev-type">{ev.type}</div>
+                    <div className="ev-name">{ev.name}</div>
+                    <div className="ev-desc">{ev.desc}</div>
                   </div>
                 ))}
               </div>
-              <div className="notebook">
-                <div className="notebook-line">Learning in public.</div>
-                <div className="notebook-line">Shipping small.</div>
-                <div className="notebook-line">Iterating always.</div>
-                <div className="notebook-signature">— Bharath</div>
+              {/* Photo Mosaic */}
+              <div className="photo-mosaic">
+                <div className="photo-item span2">
+                  <img src={asset('images/devfest1.jpg')} alt="GDG DevFest Mumbai" loading="lazy" />
+                  <div className="photo-cap">GDG DevFest Mumbai</div>
+                </div>
+                <div className="photo-item">
+                  <img src={asset('images/aws_badge.jpg')} alt="AWS Community Day" loading="lazy" />
+                  <div className="photo-cap">AWS Community Day Mumbai</div>
+                </div>
+                <div className="photo-item">
+                  <img src={asset('images/flutterflow.jpg')} alt="FlutterFlow Day" loading="lazy" />
+                  <div className="photo-cap">FlutterFlow Community Day</div>
+                </div>
+                <div className="photo-item">
+                  <img src={asset('images/mtw.jpg')} alt="Mumbai Tech Week" loading="lazy" />
+                  <div className="photo-cap">Mumbai Tech Week</div>
+                </div>
+                <div className="photo-item">
+                  <img src={asset('images/ibs_badge.jpg')} alt="India Brand Summit" loading="lazy" />
+                  <div className="photo-cap">India Brand Summit 2025</div>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="section experience-section" id="experience">
-          <div className="page-width">
-            <SectionTitle detail="A place for the work that happens with a team.">Experience</SectionTitle>
-            <div className="experience-timeline">
-              {experiences.map((experience, index) => <article className="timeline-item" key={`${experience.company}-${experience.role}`}><div className="timeline-marker">0{index + 1}</div><div className="timeline-copy"><div className="experience-meta"><span>{experience.role}</span><span>{experience.period}</span></div><h3>{experience.company}</h3><div className="experience-facts"><span>{experience.location}</span><a href={experience.href} target={experience.href.startsWith('#') ? undefined : '_blank'} rel={experience.href.startsWith('#') ? undefined : 'noreferrer'}>{experience.href.startsWith('#') ? 'Read the product story' : 'View LinkedIn'} <Arrow external /></a></div><p>{experience.description}</p>{experience.highlights && <><span className="experience-contribution-label">Selected contributions</span><ul className="experience-highlights">{experience.highlights.map((highlight) => <li key={highlight}>{highlight}</li>)}</ul></>}<div className="stack-list">{experience.stack.map((item) => <span key={item}>{item}</span>)}</div></div></article>)}
-            </div>
-          </div>
-        </section>
-
-        <section className="section dark-section contributions-section" id="contributions">
-          <div className="page-width">
-            <SectionTitle detail="Showing up, one commit at a time.">Open source / contributions</SectionTitle>
-            <div className="contributions-layout">
-              <div className="contribution-data">
-                <div className="contribution-headline"><strong>bharath-541 + bharath-ayu</strong><span>One combined matrix for both public build logs.</span></div>
-                <div className="contribution-links"><a href={profileLinks.primaryGithub} target="_blank" rel="noreferrer">@bharath-541 <Arrow external /></a><a href={profileLinks.ayuGithub} target="_blank" rel="noreferrer">@bharath-ayu <Arrow external /></a></div>
-                <div className="contribution-stats"><div><strong>258</strong><span>contributions</span></div><div><strong>141</strong><span>local commits</span></div><div><strong>03</strong><span>private repos</span></div></div>
-                <ContributionGrid />
-                <p className="snapshot-note">Combined GitHub activity snapshot · {contributionSnapshot.period} · {contributionSnapshot.total} contributions across both accounts.</p>
-                <p className="contribution-work-note">Private product work includes ABDM / ABHA health integrations, OCR and PDF processing, WebSocket AI chat, medication reminders, and WhatsApp automation.</p>
+        {/* ── Contact ───────────────────────────────────── */}
+        <section className="section section-off" id="contact">
+          <div className="wrap">
+            <div className="contact-grid">
+              <div>
+                <h2 className="c-head">Let's build<br />something impactful.</h2>
+                <p className="c-sub">
+                  Open to backend &amp; AI engineering roles, high-velocity startup collaborations, and hackathon teams. Let's connect.
+                </p>
+                <div className="c-rows">
+                  <a href={L.mail} className="crow">
+                    <Ico n="mail" /><span>pernibharath15@gmail.com</span>
+                  </a>
+                  <a href={L.li} target="_blank" rel="noreferrer" className="crow">
+                    <Ico n="li" /><span>linkedin.com/in/perni-bharath-raghavendra</span>
+                  </a>
+                  <a href={L.gh} target="_blank" rel="noreferrer" className="crow">
+                    <Ico n="gh" /><span>github.com/bharath-541</span>
+                  </a>
+                  <a href={L.cv} download target="_blank" rel="noreferrer" className="crow">
+                    <Ico n="dl" /><span>Download Résumé (PDF)</span>
+                  </a>
+                </div>
               </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="section skills-section" id="stack">
-          <div className="page-width">
-            <SectionTitle detail="Languages, frameworks, data, and the tools around them.">Tech stack</SectionTitle>
-            <div className="skills-grid">{techSkills.map((skill) => <SkillLogo key={skill.name} skill={skill} />)}</div>
-          </div>
-        </section>
-
-        <section className="section contact-section" id="contact">
-          <div className="page-width">
-            <SectionTitle detail="I’d love to hear about your ideas or projects.">Say hello</SectionTitle>
-            <div className="contact-layout">
-              <div className="contact-details">
-                <a href={profileLinks.email}><Icon name="mail" /><span>pernibharath15@gmail.com</span></a>
-                <div><Icon name="pin" /><span>Bengaluru, India</span></div>
-                <a href={profileLinks.primaryGithub} target="_blank" rel="noreferrer"><Icon name="github" /><span>github.com/bharath-541</span></a>
-                <a href={profileLinks.ayuGithub} target="_blank" rel="noreferrer"><Icon name="github" /><span>github.com/bharath-ayu</span></a>
-                <a href={profileLinks.linkedin} target="_blank" rel="noreferrer"><Icon name="linkedin" /><span>linkedin.com/in/perni-bharath-raghavendra</span></a>
-              </div>
-              <form className="contact-form" onSubmit={(event) => { event.preventDefault(); setSent(true) }}>
-                <div className="form-row"><input aria-label="Name" placeholder="Name" required /><input type="email" aria-label="Email" placeholder="Email" required /></div>
-                <textarea aria-label="Message" placeholder="Message" required></textarea>
-                <button className="button button-dark" type="submit">{sent ? 'Message noted' : 'Send message'} <Arrow /></button>
-                {sent && <p className="form-success">Thanks — I’ll get back to you soon.</p>}
+              <form className="form" onSubmit={e => { e.preventDefault(); setSent(true) }}>
+                <div className="frow">
+                  <input className="fi" aria-label="Name" placeholder="Your Name" required />
+                  <input className="fi" type="email" aria-label="Email" placeholder="Your Email" required />
+                </div>
+                <textarea className="fi fta" aria-label="Message" placeholder="Tell me about your project, team, or opportunity..." required />
+                <button className="fsub" type="submit">
+                  {sent ? 'Message Sent ✓' : 'Send Message →'}
+                </button>
+                {sent && <p className="fok">Thanks for reaching out! I will respond promptly.</p>}
               </form>
             </div>
-            <footer className="footer"><span>© 2026 Perni Bharath Raghavendra</span><span>Built with curiosity &amp; code. <span className="footer-symbol">&lt;/&gt;</span></span></footer>
+            <div className="footer">
+              <span>© 2026 Perni Bharath Raghavendra. All rights reserved.</span>
+              <span>Backend Systems · AI Engineering · Venture Building &lt;/&gt;</span>
+            </div>
           </div>
         </section>
-      </main>
-    </div>
-  )
-}
 
-function ContributionGrid() {
-  const cells = useMemo(() => Array.from({ length: Math.max(contributionSnapshot.main.length, contributionSnapshot.ayu.length) }, (_, index) => Math.max(Number(contributionSnapshot.main[index] ?? 0), Number(contributionSnapshot.ayu[index] ?? 0))), [])
-  return (
-    <div className="contribution-grid-wrap contribution-grid-scroll">
-      <div className="month-row"><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span><span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span></div>
-      <div className="grid-and-days"><div className="day-labels"><span>Mon</span><span>Wed</span><span>Fri</span></div><div className="contribution-grid">{cells.map((value, index) => <span key={index} className={`cell level-${value}`}></span>)}</div></div>
-      <div className="grid-legend"><span>Less</span><i className="cell level-0"></i><i className="cell level-1"></i><i className="cell level-2"></i><i className="cell level-3"></i><i className="cell level-4"></i><span>More</span></div>
-    </div>
+      </div>
+    </>
   )
 }
 
