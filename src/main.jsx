@@ -350,23 +350,29 @@ function Chip({ s }) {
   )
 }
 
-function ContribPulse() {
+function ContribMatrix() {
   const cells = useMemo(() => Array.from(
     { length: Math.max(C.m.length, C.a.length) },
-    (_, i) => Math.max(Number(C.m[i] ?? 0), Number(C.a[i] ?? 0))
+    (_, i) => Math.min(4, Number(C.m[i] ?? 0) + Number(C.a[i] ?? 0))
   ), [])
-  const weeks = useMemo(() => Array.from({ length: Math.ceil(cells.length / 7) }, (_, i) => cells.slice(i * 7, i * 7 + 7).reduce((sum, value) => sum + value, 0)), [cells])
-  const recentWeeks = weeks.slice(-52)
-  const maxWeek = Math.max(...recentWeeks, 1)
+  const months = ['Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug']
+
   return (
-    <div className="contribution-pulse">
-      <div className="pulse-head"><span>Weekly contribution pulse</span><span>Aug 2025 — Aug 2026</span></div>
-      <div className="pulse-chart" aria-label="Combined weekly contribution activity">
-        <div className="pulse-scale"><span>HIGH</span><span>LOW</span></div>
-        <div className="pulse-bars">{recentWeeks.map((value, index) => <span key={index} className="pulse-bar" style={{ height: `${Math.max(8, (value / maxWeek) * 100)}%` }} />)}</div>
+    <div className="matrix-shell">
+      <div className="matrix-head"><span>Combined contribution matrix</span><span>Aug 2025 — Aug 2026</span></div>
+      <div className="matrix-scroll">
+        <div className="matrix-months">{months.map((month, index) => <span key={`${month}-${index}`}>{month}</span>)}</div>
+        <div className="matrix-body">
+          <div className="matrix-days" aria-hidden="true"><span>Mon</span><span>Wed</span><span>Fri</span></div>
+          <div className="contribution-matrix" aria-label="Combined daily contributions from both GitHub profiles">
+            {cells.map((level, index) => <span key={index} className={`matrix-cell level-${level}`} title={`${level === 0 ? 'No' : `Level ${level}`} contribution activity`} />)}
+          </div>
+        </div>
       </div>
-      <div className="pulse-labels">{['Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'].map(m => <span key={m}>{m}</span>)}</div>
-      <div className="pulse-legend"><span className="pulse-dot" /> merged activity from both GitHub identities</div>
+      <div className="matrix-foot">
+        <span>bharath-541 + bharath-ayu</span>
+        <div className="matrix-legend"><span>Less</span>{[0, 1, 2, 3, 4].map(level => <i key={level} className={`matrix-cell level-${level}`} />)}<span>More</span></div>
+      </div>
     </div>
   )
 }
@@ -798,7 +804,7 @@ export default function App() {
                 <div className="cn"><strong>141</strong><span>local commits</span></div>
                 <div className="cn"><strong>3</strong><span>private org repos</span></div>
               </div>
-              <ContribPulse />
+              <ContribMatrix />
               <p style={{ marginTop: 14, color: 'rgba(240,240,240,.32)', fontSize: 11, lineHeight: 1.65 }}>
                 Combined Aug 2025 – Aug 2026 · Includes private repositories across ABDM/ABHA healthcare integrations, OCR document processing pipelines, WebSocket chat services, and automated notification engines.
               </p>
