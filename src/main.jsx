@@ -796,7 +796,7 @@ export default function App() {
             </div>
 
             <div className="contrib-block">
-              <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 16, color: 'rgba(240,240,240,.75)' }}>
+              <div className="contrib-title">
                 GitHub Activity Matrix — bharath-541 + bharath-ayu
               </div>
               <div className="contrib-nums">
@@ -805,7 +805,7 @@ export default function App() {
                 <div className="cn"><strong>3</strong><span>private org repos</span></div>
               </div>
               <ContribMatrix />
-              <p style={{ marginTop: 14, color: 'rgba(240,240,240,.32)', fontSize: 11, lineHeight: 1.65 }}>
+              <p className="contrib-note">
                 Combined Aug 2025 – Aug 2026 · Includes private repositories across ABDM/ABHA healthcare integrations, OCR document processing pipelines, WebSocket chat services, and automated notification engines.
               </p>
             </div>
